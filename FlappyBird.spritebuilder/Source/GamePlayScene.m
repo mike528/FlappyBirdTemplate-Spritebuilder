@@ -18,6 +18,22 @@
 -(void) update: (CCTime) delta
 {
     // put update code here
+
+    // this will be run every frame
+    // delta is the time that has elapsed since the last time it was run. This is usually 1/60, but can be bigger if the game slows down
+    
+    // Increment the time since the last obstacle was added
+    timeSinceObstacle += delta;         // delta is approximately 1/60th of a second
+    
+    // Check to see if two seconds have passed
+    if (timeSinceObstacle > 2.0f)
+    {
+        [self addObstacle];             // Add a new obstacle
+        
+        timeSinceObstacle = 0.0f;       // Then reset the timer
+    }
+    
+    
 }
 
 // put new methods here
