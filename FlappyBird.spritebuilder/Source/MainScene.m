@@ -180,6 +180,7 @@
         }
     }
     
+    /*
     // move and loop the bushes
     for (CCNode *bush in _bushes) {
         // move the bush
@@ -201,8 +202,8 @@
             cloud.position = ccp(cloud.position.x + 2 * cloud.contentSize.width, cloud.position.y);
         }
     }
-
-    /*
+    */
+    
     // loop the bushes
     for (CCNode *bush in _bushes) {
         // get the world position of the bush
@@ -237,7 +238,7 @@
             }
         }
     }
-    */
+    
     
     
     
