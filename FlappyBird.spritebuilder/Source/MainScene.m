@@ -14,6 +14,14 @@
     CCNode *_ground2;
     NSArray *_grounds;
     
+    CCNode *_cloud1;
+    CCNode *_cloud2;
+    NSArray *_clouds;
+    
+    CCNode *_bush1;
+    CCNode *_bush2;
+    NSArray *_bushes;
+    
     NSTimeInterval _sinceTouch;
     
     NSMutableArray *_obstacles;
@@ -28,10 +36,12 @@
 }
 
 
-- (void)didLoadFromCCB {
+- (void) didLoadFromCCB {
     self.userInteractionEnabled = TRUE;
     
     _grounds = @[_ground1, _ground2];
+    _clouds = @[_cloud1, _cloud2];
+    _bushes = @[_bush1, _bush2];
     
     for (CCNode *ground in _grounds) {
         // set collision txpe
@@ -51,7 +61,7 @@
 
 #pragma mark - Touch Handling
 
-- (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event {
+- (void) touchBegan: (UITouch *) touch withEvent: (UIEvent *) event {
     if (!_gameOver) {
         [character.physicsBody applyAngularImpulse:10000.f];
         _sinceTouch = 0.f;
@@ -69,7 +79,7 @@
 
 #pragma mark - Game Actions
 
-- (void)gameOver {
+- (void) gameOver {
     if (!_gameOver) {
         _gameOver = TRUE;
         _restartButton.visible = TRUE;
@@ -88,14 +98,14 @@
     }
 }
 
-- (void)restart {
+- (void) restart {
     CCScene *scene = [CCBReader loadAsScene:@"MainScene"];
     [[CCDirector sharedDirector] replaceScene:scene];
 }
 
 #pragma mark - Obstacle Spawning
 
-- (void)addObstacle {
+- (void) addObstacle {
     Obstacle *obstacle = (Obstacle *)[CCBReader load:@"Obstacle"];
     CGPoint screenPosition = [self convertToWorldSpace:ccp(380, 0)];
     CGPoint worldPosition = [physicsNode convertToNodeSpace:screenPosition];
@@ -108,13 +118,13 @@
 
 #pragma mark - Update
 
-- (void)showScore
+- (void) showScore
 {
     _scoreLabel.string = [NSString stringWithFormat:@"%d", points];
     _scoreLabel.visible = true;
 }
 
-- (void)update:(CCTime)delta
+- (void) update: (CCTime) delta
 {
     _sinceTouch += delta;
     
@@ -143,6 +153,29 @@
             ground.position = ccp(ground.position.x + 2 * ground.contentSize.width, ground.position.y);
         }
     }
+    
+    // move and loop the bushes
+    for (CCNode *bush in _bushes) {
+        // move the bush
+        bush.position = ccp(bush.position.x - (character.physicsBody.velocity.x * delta), bush.position.y);
+        
+        // if the left corner is one complete width off the screen, move it to the right
+        if (bush.position.x <= (-1 * bush.contentSize.width)) {
+            bush.position = ccp(bush.position.x + 2 * bush.contentSize.width, bush.position.y);
+        }
+    }
+    
+    // move and loop the clouds
+    for (CCNode *cloud in _clouds) {
+        // move the cloud
+        cloud.position = ccp(cloud.position.x - (character.physicsBody.velocity.x * delta), cloud.position.y);
+        
+        // if the left corner is one complete width off the screen, move it to the right
+        if (cloud.position.x <= (-1 * cloud.contentSize.width)) {
+            cloud.position = ccp(cloud.position.x + 2 * cloud.contentSize.width, cloud.position.y);
+        }
+    }
+    
     
     NSMutableArray *offScreenObstacles = nil;
     
@@ -177,12 +210,12 @@
     }
 }
 
--(BOOL)ccPhysicsCollisionBegin:(CCPhysicsCollisionPair*)pair character:(CCSprite*)character level:(CCNode*)level {
+-(BOOL) ccPhysicsCollisionBegin: (CCPhysicsCollisionPair *) pair character: (CCSprite *) character level: (CCNode *) level {
     [self gameOver];
     return TRUE;
 }
 
--(BOOL)ccPhysicsCollisionBegin:(CCPhysicsCollisionPair *)pair character:(CCNode *)character goal:(CCNode *)goal {
+-(BOOL) ccPhysicsCollisionBegin: (CCPhysicsCollisionPair *) pair character: (CCNode *) character goal: (CCNode *) goal {
     [goal removeFromParent];
     points++;
     _scoreLabel.string = [NSString stringWithFormat:@"%d", points];
